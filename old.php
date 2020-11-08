@@ -1,41 +1,13 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <?php
 
-error_reporting(E_ALL);
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-
-// $session = JFactory::getSession();
-$session = array();
-// start get card info
-$url = 'http://localhost/ss/m_getcartinfo.php';
 
 error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 
-$fields =['user_id'=>0];
-$user_id = json_encode($fields);
-// $session = JFactory::getSession();
-$session = array();
-$url = 'http://localhost/ss/m_getcartinfo.php';
-// start get card info
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $user_id);
-// curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+$session = JFactory::getSession();
 
-$result = curl_exec($ch);
-if (curl_errno($ch)) {
-  $error_msg = curl_error($ch);
-  print_r($error_msg);
-}
-curl_close($ch);
-
-echo $result[0];
-
-/* end get card info
-  
 $basket = $session->get("store_basket");
 
 $current_user = JFactory::getUser();
@@ -340,3 +312,36 @@ if ($basket) {
 <?php
 }
 ?>
+
+<script>
+  function setPosition(position) {
+
+    console.log(position);
+
+    document.getElementById("lat").value = position.latitude;
+
+    document.getElementById("lng").value = position.longitude;
+  }
+
+  function do_something(coords) {
+    console.log(coords);
+    // Do something with the coords here
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(position) {
+      setPosition(position.coords);
+    },
+    function(failure) {
+      $.getJSON('https://ipinfo.io/geo', function(response) {
+        var loc = response.loc.split(',');
+        var coords = {
+          latitude: loc[0],
+          longitude: loc[1]
+        };
+        console.log(coords)
+        setPosition(coords);
+      });
+    }
+  );
+</script>
