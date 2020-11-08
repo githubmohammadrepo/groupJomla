@@ -1,81 +1,42 @@
 <?php
-
+include_once('./getUserLocation.php');
 error_reporting(E_ALL);
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 
-// $session = JFactory::getSession();
-$session = array();
-// start get card info
-$url = 'http://localhost/ss/m_getcartinfo.php';
+// set default user_id to 0;
+$user_id = 963;
+//get nearest stores
+/**
+ * start get nearest shops
+ */
+if (isset($_POST) && isset($_POST["lat"]) && isset($_POST["lng"])) {
 
-error_reporting(E_ALL);
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
+  $post = [
+    'lat' => 0,
+    'lng' => 0,
+  ];
+  // $url = "http://hypernetshow.com/serverHypernetShowUnion/SelectNearestShop.php";
 
-$fields =['user_id'=>0];
-$user_id = json_encode($fields);
-// $session = JFactory::getSession();
-$session = array();
-$url = 'http://localhost/ss/m_getcartinfo.php';
-// start get card info
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $user_id);
-// curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  // start get lat and lng location current user.
+  // using class
+  $getCard =new getUserLocation($conn);
+  $userLocationResult = json_decode($getCard->getData($user_id),true);
+  foreach ($userLocationResult as $key => $value) { 
+    if($key ==0){
 
-$result = curl_exec($ch);
-if (curl_errno($ch)) {
-  $error_msg = curl_error($ch);
-  print_r($error_msg);
-}
-curl_close($ch);
-
-echo $result[0];
-
-/* end get card info
-  
-$basket = $session->get("store_basket");
-
-$current_user = JFactory::getUser();
-
-$foundStore = 0;
-
-$cardSaved = false;
-
-//update basket session
-
-if (isset($_POST) && isset($_POST["pid"])) {
-
-  $newBasket = [];
-
-  if ($basket) {
-
-    $found = false;
-
-    for ($i = 0; $i < count($basket); $i++) {
-
-      if ($basket[$i]["product_id"] != $_POST["pid"]) {
-
-        $newBasket[] = $basket[$i];
-      }
+    }else{
+      
+      $post['lat']= $value['latitude'];
+      $post['lng']= $value['longitude'];
     }
   }
 
-  $session->set('store_basket', $newBasket);
-}
+  // end get lat and lng location current user. **completed** 
 
-//get nearest stores
 
-if (isset($_POST) && isset($_POST["lat"]) && isset($_POST["lng"])) {
-
-  $url = "http://hypernetshow.com/serverHypernetShowUnion/SelectNearestShop.php";
-
-  $post = [
-    'lat' => $_POST["lat"],
-    'lng' => $_POST["lng"],
-  ];
+  // start select nearest shop
+  $url = "http://hypertester.ir/serverHypernetShowUnion/SelectNearestShop.php";
 
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, $url);
@@ -91,6 +52,8 @@ if (isset($_POST) && isset($_POST["lat"]) && isset($_POST["lng"])) {
   $contents = json_decode($output, true);
 
   $foundStore = -1;
+
+  // end select nearest shop
 
   if ($contents && count($contents) > 0) {
 
@@ -177,166 +140,18 @@ if (isset($_POST) && isset($_POST["lat"]) && isset($_POST["lng"])) {
     $foundStore = -1;
   }
 }
-
-$servername = "localhost";
-$username = "hypernet_user";
-$password = "sghl@1362";
-$db_name = "hypernet_db";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $db_name);
-
-$imagePath = "http://www.fishopping.ir/images/com_hikashop/upload/";
-
-// Check connection
-if ($conn->connect_error) {
-  die("Connection failed: " . $conn->connect_error);
-}
-mysqli_set_charset($conn, "utf8");
-
-$p_ids = [];
-
-$session = JFactory::getSession();
-$basket = $session->get('store_basket');
-
-if ($basket) {
-  for ($i = 0; $i < count($basket); $i++) {
-
-    $p_ids[] = $basket[$i]['product_id'];
-  }
-
-  //query
-
-  $ids = implode(",", $p_ids);
-  $sql1 = "SELECT pish_hikashop_product.*, pish_hikashop_file.file_path as product_image
-FROM pish_hikashop_product
-LEFT JOIN pish_hikashop_file ON pish_hikashop_product.product_id=pish_hikashop_file.file_ref_id
-WHERE pish_hikashop_product.product_id IN ({$ids})
-GROUP BY pish_hikashop_product.product_id, pish_hikashop_file.file_path";
-
-  $result1 = $conn->query($sql1);
-
-  $arr_res = array();
-
-  if ($result1->num_rows > 0) {
-
-    // output data of each row
-    for ($i = 0; $i < $result1->num_rows; $i++) {
-      $row = $result1->fetch_assoc();
-      $arr_res[$i] = $row;
-      $arr_res[$i]['product_sort_price'] = $row['product_sort_price'] / 10;
-      $arr_res[$i]['product_msrp'] = $row['product_msrp'] / 10;
-      $arr_res[$i]['product_image'] = $imagePath . $row['product_image'];
-    }
-  }
-
-  ////
-
-}
-
-if ($cardSaved) {
+/**
+ * end get nearest shops
+ */
 
 ?>
 
-  <div style="text-align: center; background-color: #eee; padding: 10px; margin-bottom: 10px; color: green; font-size: 16px; font-weight: bold;">
+<form method="post" style="text-align: left;">
 
-    <p>سبد خرید با موفقیت برای فروشگاه های نزدیک شما ارسال شد. </p>
+<input type="hidden" id="lat" name="lat" value="">
 
-  </div>
+<input type="hidden" id="lng" name="lng" value="">
 
-<?php
+<button type="submit" name"send_card">ارسال سبد خرید</button>
 
-}
-
-if ($basket) {
-?>
-
-  <form method="post" style="text-align: left;">
-
-    <input type="hidden" id="lat" name="lat" value="">
-
-    <input type="hidden" id="lng" name="lng" value="">
-
-    <button type="submit" name"send_card">ارسال سبد خرید</button>
-
-  </form>
-
-
-
-  <?php
-
-  if ($foundStore == -1) {
-
-  ?>
-
-    <div style="text-align: center; background-color: #eee; padding: 10px; margin-bottom: 10px; color: red; font-size: 16px; font-weight: bold;">
-
-      <p>فروشگاهی در نزدیکی شما پیدا نشد.</p>
-
-    </div>
-
-  <?php
-
-  }
-
-  ?>
-
-
-
-  <?php
-  for ($i = 0; $i < count($arr_res); $i++) {
-  ?>
-
-
-
-    <div class="prodBox" style="flex: 30%;text-decoration: none;margin: 5px;padding: 0px;border: none;background-color: white;padding: 5px;border: 1px solid #eeeeee;min-height: 100px;">
-
-      <div style="display: flex; flex-direction: row;justify-content: flex-start;">
-        <img src="<?= $arr_res[$i]["product_image"] ?>" style="max-width:100px;max-height:140px;margin-right: 10px;margin-left: 10px;" />
-        <div style="display: flex; flex-direction: column;justify-content: center;">
-          <div style="margin-bottom: 5px;">
-            <p style="display: inline;">نام محصول:</p>
-            <p style="display: inline;font-weight: bold"><?= $arr_res[$i]["product_name"] ?></p>
-          </div>
-          <div style="margin-bottom: 5px;display: none;">
-            <p style="display: inline;">نام برند:</p>
-            <p style="display: inline;font-weight: bold"><?= $arr_res[$i]["category_name"] ?></p>
-          </div>
-          <div style="margin-bottom: 5px;">
-            <p style="display: inline;">قیمت واحد:</p>
-            <p style="display: inline;font-weight: bold"><?= $arr_res[$i]["product_sort_price"] ?></p>
-          </div>
-
-          <div style="margin-bottom: 5px;">
-            <p style="display: inline;">تعداد:</p>
-            <p style="display: inline;font-weight: bold"><?= $basket[$i]['count'] ?></p>
-          </div>
-
-          <div style="margin-bottom: 5px;">
-            <form method="post">
-
-              <input type="hidden" name="pid" value="<?= $arr_res[$i]["product_id"] ?>">
-
-              <button style="background-color: red;color: white;" type="submit">حذف</button>
-
-            </form>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-  <?php
-  }
-} else {
-  ?>
-
-  <div>
-    <p style="width: 100%; background-color: #eee; padding: 10px; text-align: center;">
-      سبد خرید خالی می باشد.
-    </p>
-  </div>
-
-<?php
-}
-?>
+</form>

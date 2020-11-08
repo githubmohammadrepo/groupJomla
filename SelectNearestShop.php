@@ -25,7 +25,7 @@ id,user_id,
    sin(radians(latitude)))
 ) AS distance 
 FROM pish_phocamaps_marker_store 
-HAVING distance < 1 and user_id is not null
+HAVING user_id is not null
 ORDER BY distance LIMIT 0, 20";
 $result = $conn->query($sql5);
 if ($result->num_rows > 0) 
