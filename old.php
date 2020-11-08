@@ -150,7 +150,7 @@ if (isset($_POST) && isset($_POST["lat"]) && isset($_POST["lng"])) {
   }
 }
 
-$servername = "localhost";
+$servername = "https://sadra.mrservers.net:2083/";
 $username = "hypernet_user";
 $password = "sghl@1362";
 $db_name = "hypernet_db";
