@@ -12,7 +12,8 @@ $post = json_decode($json, true);
 $lat = $post["lat"];
 $lng = $post["lng"];
 
-
+//mohammad ravnad
+//ichange this sql --> this line (HAVING distance < 1 and user_id is not null)
 $sql5= "SELECT 
 id,user_id, 
 (

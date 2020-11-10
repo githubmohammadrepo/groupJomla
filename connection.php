@@ -6,8 +6,8 @@
  * Time: 10:47 PM
  */
 $servername = "localhost";
-$username = "root";
-$password = "";
+$username = "hyperboo_user";
+$password = "sghl@1362";
 $db_name = "hyperboo_db";
 
 // Create connection

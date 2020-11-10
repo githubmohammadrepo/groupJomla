@@ -63,7 +63,8 @@ class getUserLocation
 $json = file_get_contents('php://input');
 $post = json_decode($json, true);
 $user_id = $post["user_id"];
-$user_id = 963;
 $getCard = new getUserLocation($conn);
-$userLocationResult = json_decode($getCard->getData($user_id), true);
+$userLocationResult = $getCard->getData($user_id);
 print_r($userLocationResult);
+
+

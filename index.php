@@ -1,8 +1,8 @@
-{source}
+<!-- {source} -->
+ <?php
 
  
 
- <?php
 
  $session = JFactory::getSession();
 
@@ -80,7 +80,7 @@ foreach ($result as $key => $value) {
 
   } else {
 
-    $basket = $result;
+    $basket[$key-1] = $value;
 
   }
 
@@ -256,11 +256,9 @@ if (isset($_POST) && isset($_POST["lat"]) && isset($_POST["lng"])) {
 
       for ($k = 0; $k < count($basket); $k++) {
 
-        if ($k == 0) {
+        if (true) {
 
-        } else {
-
-          
+//        } else {
 
           $product_id = $basket[$k]->product_id;
 
@@ -462,7 +460,9 @@ if ($basket) {
 
   for ($i = 0; $i < count($basket); $i++) {
 
-    if ($i != 0) {
+   if(true){
+
+    //if ($i != 0) {
 
       $p_ids[] = $basket[$i]->product_id;
 
@@ -470,13 +470,15 @@ if ($basket) {
 
   }
 
+ 
+
 // var_dump($p_ids);
 
   //query
 
  
 
-  $url = "http://hypertester.ir/serverHypernetShowUnion/getUserCardProducts.php";
+  $url = "http://hypertester.ir/serverHypernetShowUnion/m_getcartinfo.php";
 
  
 
@@ -512,7 +514,23 @@ if ($basket) {
 
   $arr_res =(json_decode($output,true));
 
-//var_dump($arr_res);
+// var_dump($arr_res);
+
+//set or combine two array  basket and product_basket
+
+foreach($basket as $key => $value){
+
+  foreach($arr_res as $k => $v){
+
+      if($value->product_id == $v['product_id']){
+
+          $arr_res[$k]['quantity'] = $value->cart_product_quantity;
+
+      }
+
+   }
+
+}
 
   // $arr_res[$i]['product_image'] = $imagePath . $row['product_image'];
 
@@ -624,6 +642,8 @@ if ($basket) {
 
   <?php
 
+//var_dump($arr_res);
+
  
 
  for ($i = 0; $i < count($arr_res); $i++) {
@@ -662,17 +682,17 @@ if ($basket) {
 
             <p style="display: inline;">قیمت واحد:</p>
 
-            <p style="display: inline;font-weight: bold"><?= $arr_res[$i]["product_counting_unit"] ?></p>
+            <p style="display: inline;font-weight: bold"><?= $arr_res[$i]['product_sort_price'] ?></p>
 
           </div>
 
- 
+          
 
           <div style="margin-bottom: 5px;">
 
             <p style="display: inline;">تعداد:</p>
 
-            <p style="display: inline;font-weight: bold"><?= $basket[$i]->cart_product_quantity ?? "" ?></p>
+            <p style="display: inline;font-weight: bold"><?= $arr_res[$i]['quantity'] ?></p>
 
           </div>
 
@@ -684,7 +704,7 @@ if ($basket) {
 
  
 
-              <input type="hidden" name="pid" value="<?= $arr_res[$i]['product_id'] ?>">
+              <input type="hidden" name="pid" value="<?= $arr_res[$i]['product_id']  ?>">
 
  
 
@@ -734,4 +754,4 @@ if ($basket) {
 
 ?> 
 
-{/source}
+<!-- {/source} -->
