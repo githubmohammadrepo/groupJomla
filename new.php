@@ -2,13 +2,19 @@
 
  
 
- <?php
+ 
+
+ 
+
+<?php
 
  $session = JFactory::getSession();
 
 $current_user = JFactory::getUser();
 
- $user_id = $current_user->id;
+$user_id = $current_user->id;
+
+ 
 
 error_reporting(E_ALL);
 
@@ -69,8 +75,6 @@ curl_close($ch);
 // echo $result;
 
 $result = (json_decode($result));
-
-//var_dump($result);
 
 foreach ($result as $key => $value) {
 
@@ -470,7 +474,7 @@ if ($basket) {
 
   }
 
-// var_dump($p_ids);
+ 
 
   //query
 
@@ -480,7 +484,7 @@ if ($basket) {
 
  
 
- 
+  $p_ids = [49521,9744,53364,8798,9804,8548];
 
  
 
@@ -511,8 +515,6 @@ if ($basket) {
  
 
   $arr_res =(json_decode($output,true));
-
-//var_dump($arr_res);
 
   // $arr_res[$i]['product_image'] = $imagePath . $row['product_image'];
 
@@ -624,9 +626,7 @@ if ($basket) {
 
   <?php
 
- 
-
- for ($i = 0; $i < count($arr_res); $i++) {
+  for ($i = 0; $i < count($arr_res); $i++) {
 
   ?>
 
@@ -662,7 +662,7 @@ if ($basket) {
 
             <p style="display: inline;">قیمت واحد:</p>
 
-            <p style="display: inline;font-weight: bold"><?= $arr_res[$i]["product_counting_unit"] ?></p>
+            <p style="display: inline;font-weight: bold"><?= $arr_res[$i]["product_sort_price"] ?></p>
 
           </div>
 
@@ -672,7 +672,7 @@ if ($basket) {
 
             <p style="display: inline;">تعداد:</p>
 
-            <p style="display: inline;font-weight: bold"><?= $basket[$i]->cart_product_quantity ?? "" ?></p>
+            <p style="display: inline;font-weight: bold"><?= $basket[$i]->product_counting_unit ?? "" ?></p>
 
           </div>
 

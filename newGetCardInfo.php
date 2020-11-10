@@ -1,38 +1,32 @@
 <?php
 require_once('./connection.php');
+
 class getCardInfo
 {
   private $sql;
   protected $user_id;
   private $conn;
-  public $getDataType = 'none';
-  public $ids;
-  public function __construct($conn,$user_id,$p_ids)
+  public function __construct($conn)
   {
     $this->conn = $conn;
-    $this->user_id = $user_id;
-    $this->ids = $p_ids;
-    
   }
 
 
   public function getData()
   {
-    if($this->getDataType=='getProduct'){
-      $this->setSqlGetProductInfo();
-    }elseif($this->getDataType=='getBasket'){
-      $this->setSqlGetBasketInfo();
-    }else{
-      $this->failResponse();
-    }
-    
+    $json = file_get_contents('php://input');
+    $post = json_decode($json, true);
+    $this->user_id = $post["user_id"];
+
     $this->setUserIdInSql();
     if (isset($this->user_id)) {
+
 
       $result = $this->conn->query($this->sql);
 
       if ($result->num_rows > 0) {
         // output data of each row
+
         //set status
         $dev_array[] = ['status' => 1, 'text' => 'found'];
         while ($row = $result->fetch_assoc()) {
@@ -58,17 +52,8 @@ class getCardInfo
     echo $jsonEncode;
   }
 
-  // set user id to sql for get card info
-  private function setSqlGetProductInfo(){
-    $this->sql = "SELECT pish_hikashop_product.*, pish_hikashop_file.file_path as product_image
-    FROM pish_hikashop_product
-    LEFT JOIN pish_hikashop_file ON pish_hikashop_product.product_id=pish_hikashop_file.file_ref_id
-    WHERE pish_hikashop_product.product_id IN ({$this->ids})
-    GROUP BY pish_hikashop_product.product_id, pish_hikashop_file.file_path";
-  }
-
-  // set user id to sql for get all information product in basket
-  private function setSqlGetBasketInfo()
+  // set user id to sql
+  private function setUserIdInSql()
   {
     $this->sql = "SELECT" .
       " newCart.*, pish_hikashop_cart_product.cart_product_id, pish_hikashop_cart_product.cart_id AS card_product_card_id, pish_hikashop_cart_product.product_id, pish_hikashop_cart_product.cart_product_quantity, pish_hikashop_cart_product.cart_product_ref_price" .
@@ -93,22 +78,7 @@ class getCardInfo
 }
 
 
-// using class 
-$json = file_get_contents('php://input');
-$post = json_decode($json, true);
-$user_id = $post["user_id"];
-if($user_id){
-  //فقط اطلاعات سبد خرید رو بگیر
-  $getCard->getDataType='getBasket';
-}
-$p_ids = $post["p_ids"];
-if($p_ids){
-  // اطلاعات سبد خرید و جزئیات محصول روبگیر
-  $getCard->getDataType='getProduct';
-}
+
 // using class
-$getCard =new getCardInfo($conn,$user_id,$p_ids);
-
-
+$getCard = new getCardInfo($conn);
 $getCard->getData();
-
