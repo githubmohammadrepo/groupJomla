@@ -36,7 +36,7 @@ $foundStore = 0;
 $session = array();
 
 // $url = 'http://localhost/ss/getcartinfo.php';
-getCardInformations($user_id, $basket);
+
 
 function getCardInformations($user_id, &$basket)
 {
@@ -88,10 +88,67 @@ function getCardInformations($user_id, &$basket)
   }
 }
 
+getCardInformations($user_id, $basket);
 // end get card info
 
 
 
+//call after $basket returned or ready
+function getShowBasketProduct($basket,&$p_ids)
+{
+  for ($i = 0; $i < count($basket); $i++) {
+
+    if (true) {
+
+      //if ($i != 0) {
+
+      $p_ids[] = $basket[$i]->product_id;
+    }
+  }
+
+  $url = "http://hypertester.ir/serverHypernetShowUnion/m_getcartinfo.php";
+
+  $ch = curl_init();
+
+  curl_setopt($ch, CURLOPT_URL, $url);
+
+  curl_setopt($ch, CURLOPT_POST, 1);
+
+  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['p_ids' => $p_ids]));
+
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+
+
+  $output = curl_exec($ch);
+
+  if (curl_errno($ch)) {
+
+    $error_msg = curl_error($ch);
+  }
+
+  curl_close($ch);
+
+
+
+
+
+  $array_res = (json_decode($output, true));
+
+  //set or combine two array  basket and product_basket
+  foreach ($basket as $key => $value) {
+
+    foreach ($array_res as $k => $v) {
+
+      if ($value->product_id == $v['product_id']) {
+
+        $array_res[$k]['quantity'] = $value->cart_product_quantity;
+      }
+    }
+  }
+
+  return $array_res;
+}
 // call show products
 $arr_res = getShowBasketProduct($basket,$p_ids);
 // var_dump($arr_res[0]['product_name']);
@@ -330,7 +387,7 @@ if (isset($_POST) && isset($_POST["lat"]) && isset($_POST["lng"])) {
 
     curl_close($ch);
 
-    var_dump($output);
+    // var_dump($output);
     $contents = json_decode($output);
     if ($contents->response == 'notok') {
       //card does not saved
@@ -427,62 +484,7 @@ $p_ids = [];
 
 
 
-//call after $basket returned or ready
-function getShowBasketProduct($basket,&$p_ids)
-{
-  for ($i = 0; $i < count($basket); $i++) {
 
-    if (true) {
-
-      //if ($i != 0) {
-
-      $p_ids[] = $basket[$i]->product_id;
-    }
-  }
-
-  $url = "http://hypertester.ir/serverHypernetShowUnion/m_getcartinfo.php";
-
-  $ch = curl_init();
-
-  curl_setopt($ch, CURLOPT_URL, $url);
-
-  curl_setopt($ch, CURLOPT_POST, 1);
-
-  curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['p_ids' => $p_ids]));
-
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-
-
-  $output = curl_exec($ch);
-
-  if (curl_errno($ch)) {
-
-    $error_msg = curl_error($ch);
-  }
-
-  curl_close($ch);
-
-
-
-
-
-  $array_res = (json_decode($output, true));
-
-  //set or combine two array  basket and product_basket
-  foreach ($basket as $key => $value) {
-
-    foreach ($array_res as $k => $v) {
-
-      if ($value->product_id == $v['product_id']) {
-
-        $array_res[$k]['quantity'] = $value->cart_product_quantity;
-      }
-    }
-  }
-
-  return $array_res;
-}
 if ($basket) {
 
 
